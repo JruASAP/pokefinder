@@ -1,4 +1,5 @@
 import tkinter as tk
+from tkinter import PhotoImage
 from PIL import Image, ImageTk
 import requests
 from io import BytesIO
@@ -6,10 +7,24 @@ from random import randint
 import vlc
 import os
 from threading import Thread
+from dotenv import load_dotenv
+import google.generativeai as genai
+
+
+load_dotenv()
 os.environ['SDL_AUDIODRIVER'] = 'pulseaudio'
+genai.configure(api_key=os.getenv('API_KEY'))
+
+model = genai.GenerativeModel('gemini-1.5-flash')
+#response = model.generate_content('This is a test for my pokemon pokefinder app!')
+
+#print(response.text)
+
+def to_plain_text(text):
+    text = text.replace('•', '*')
+    return text
 
 
-# Function to fetch Pokémon data
 def fetch_pokemon_data(pokemon_id):
     response = requests.get(f"https://pokeapi.co/api/v2/pokemon/{pokemon_id}")
     if response.status_code == 200:
@@ -49,8 +64,11 @@ def update_gui(pokemon_id):
 
         name_label.config(text=f"Name: {data['name'].title()}")
         number_label.config(text=f"Number: {data['id']}")
+        type_label.config(text=f"Type: {', '.join(type['type']['name'].title() for type in data['types'])}")
         ability_label.config(text=f"Abilities: {', '.join(ability['ability']['name'].title() for ability in data['abilities'])}")
-
+        gemini_facts_request = model.generate_content(f"You are part of the Pokéfinder app and acting as a Pokédex. What can you tell the trainer about {data['name']}?")
+      #  print(to_plain_text(gemini_facts_request.text))
+        gemini_facts.config(text=f"Pokédex Response: {to_plain_text(gemini_facts_request.text)}")
         cry = data["cries"]["latest"]
         play_cry(cry)
 
@@ -58,6 +76,9 @@ def update_gui(pokemon_id):
 # Main window
 root = tk.Tk()
 root.title("Pokéfinder")
+photo = PhotoImage(file='pokeball.png')
+root.wm_iconphoto(False, photo)
+
 
 search_frame = tk.Frame(root)
 search_entry = tk.Entry(search_frame)
@@ -80,8 +101,14 @@ name_label.pack()
 number_label = tk.Label(root, text="")
 number_label.pack()
 
+type_label = tk.Label(root, text="")
+type_label.pack()
+
 ability_label = tk.Label(root, text="")
 ability_label.pack()
+
+gemini_facts = tk.Label(root, text="")
+gemini_facts.pack()
 
 # Button to fetch a random Pokémon
 fetch_button = tk.Button(root, text="Fetch Random Pokémon", command=lambda: update_gui(randint(1, 251)))

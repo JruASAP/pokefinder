@@ -1,0 +1,11 @@
+file:/home/jruasap/.gitconfig	user.email=jruasap@gmail.com
+file:/home/jruasap/.gitconfig	user.name=Drew Sapolnick
+file:.git/config	core.repositoryformatversion=0
+file:.git/config	core.filemode=false
+file:.git/config	core.bare=false
+file:.git/config	core.logallrefupdates=true
+file:.git/config	core.ignorecase=true
+file:.git/config	remote.origin.url=https://github.com/JruASAP/pokefinder.git
+file:.git/config	remote.origin.fetch=+refs/heads/*:refs/remotes/origin/*
+file:.git/config	branch.Main.remote=origin
+file:.git/config	branch.Main.merge=refs/heads/Main
